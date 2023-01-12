@@ -1,13 +1,14 @@
-import {StyleSheet, Text, View} from 'react-native';
+import {StyleSheet, View, SafeAreaView} from 'react-native';
 import {StatusBar} from 'expo-status-bar';
+import List from './components/List';
 
 const App = () => {
   return (
     <>
-      <View style={styles.container}>
-        <Text>Open up App.js to start working on your app!</Text>
-      </View>
-      <StatusBar style="auto" />
+      <SafeAreaView style={styles.container}>
+        <List />
+        <StatusBar style="auto" />
+      </SafeAreaView>
     </>
   );
 };
