@@ -12,5 +12,5 @@ An example app using React Native
 
 ## Screenshots
 <div>
-<img src="./screenshots/assignment-1.jpeg" alt="ass1" width="200"/>
+<img src="./screenshots/assignment-1.jpg" alt="ass1" width="200"/>
 </div>
