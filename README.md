@@ -3,12 +3,11 @@
 An example app using React Native
 
 ## Features
-
-- Utilize ESlint and prettier to improve code quality
-- Implement handling touches
-- Render lists containing text and images using built-in components
-- Incorporate Flexbox layout in the project
-- Employ Props and PropTypes to structure and validate data passed to components.
+- Load data from a static JSON file
+- Utilize [fetch] function to load a JSON file
+- Use [useState] to load data into the component's state and [useEffect] to prevent infinite loops
+- Implementi error handling via [try/catch] for promises
+- Utilize the [keyExtractor] prop in [List.js] to prevent missing key warnings
 
 ## Screenshots
 <div>
