@@ -1,10 +1,12 @@
 import {StyleSheet, StatusBar, SafeAreaView} from 'react-native';
+import Banner from './components/Banner';
 import List from './components/List';
 
 const App = () => {
   return (
     <>
       <SafeAreaView style={styles.container}>
+        <Banner />
         <List />
         <StatusBar style="auto" />
       </SafeAreaView>
@@ -14,7 +16,8 @@ const App = () => {
 
 const styles = StyleSheet.create({
   container: {
-    paddingTop: Platform.OS === "android" ? StatusBar.currentHeight : 0,
+    flex: 1,
+    backgroundColor: 'rgb(31, 32, 40)',
   },
 });
 
