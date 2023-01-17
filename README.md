@@ -4,7 +4,7 @@ An example app using React Native
 
 ## Features
 
-- Implement hooks and create custom hook `useMedia`
+- Style with `flex` and `react-native-feather`
 
 ## Screenshots
 <div>
