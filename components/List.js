@@ -1,5 +1,6 @@
 import {FlatList} from 'react-native';
 import {useMedia} from '../hooks/ApiHooks';
+import PropTypes from 'prop-types';
 import ListItem from './ListItem';
 
 const List = ({navigation}) => {
@@ -9,18 +10,15 @@ const List = ({navigation}) => {
     <FlatList
       data={mediaArray}
       keyExtractor={(item, index) => index.toString()}
-      renderItem={({item}) => 
-        <ListItem 
-          navigation={navigation} 
-          singleMedia={item} 
-        />
-      }
+      renderItem={({item}) => (
+        <ListItem navigation={navigation} singleMedia={item} />
+      )}
     />
   );
 };
 
-export default List;
-
-Home.propTypes = {
+List.propTypes = {
   navigation: PropTypes.object,
 };
+
+export default List;

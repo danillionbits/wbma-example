@@ -4,10 +4,11 @@ import {uploadsUrl} from '../utils/variables';
 
 const ListItem = ({singleMedia, navigation}) => {
   const item = singleMedia;
+
   return (
-    <TouchableOpacity 
-      style={styles.container} 
-      onPress={() => navigation.navigate('Single')}
+    <TouchableOpacity
+      style={styles.container}
+      onPress={() => navigation.navigate('Single', item)}
     >
       <Image
         style={styles.image}
