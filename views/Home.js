@@ -15,7 +15,7 @@ const Home = ({navigation}) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'rgb(31, 32, 40)',
+    backgroundColor: '#fff',
   },
 });
 

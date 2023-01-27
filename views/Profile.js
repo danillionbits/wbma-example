@@ -1,12 +1,27 @@
-import React, {useContext} from 'react';
-import {StyleSheet, SafeAreaView, Text, Button} from 'react-native';
+import React, {useContext, useEffect, useState} from 'react';
 import {MainContext} from '../contexts/MainContext';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {useTag} from '../hooks/ApiHooks';
+import {uploadsUrl} from '../utils/variables';
+import {Button, Card, Icon, ListItem} from '@rneui/themed';
 
 const Profile = () => {
+  const {getFilesByTag} = useTag();
   const {setIsLoggedIn, user, setUser} = useContext(MainContext);
+  const [avatar, setAvatar] = useState('');
 
-  console.log(user);
+  const loadAvatar = async () => {
+    try {
+      const avatarArray = await getFilesByTag('avatar_' + user.user_id);
+      setAvatar(avatarArray.pop().filename);
+    } catch (error) {
+      console.log('user avatar fetch failed', error.message);
+    }
+  };
+
+  useEffect(() => {
+    loadAvatar();
+  }, []);
 
   const logout = async () => {
     setUser({});
@@ -14,29 +29,25 @@ const Profile = () => {
     try {
       await AsyncStorage.clear();
     } catch (e) {
-      console.log('Error logging out', e);
+      console.log('clearing asyncstorage failed', e);
     }
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <Text>Profile</Text>
-      <Text>username: {user.username}</Text>
-      <Text>email: {user.email}</Text>
-      <Text>full name: {user.full_name}</Text>
+    <Card>
+      <Card.Title>{user.username}</Card.Title>
+      <Card.Image source={{uri: uploadsUrl + avatar}} />
+      <ListItem>
+        <Icon name="email" />
+        <ListItem.Title>{user.email}</ListItem.Title>
+      </ListItem>
+      <ListItem>
+        <Icon name="badge" />
+        <ListItem.Title>{user.full_name}</ListItem.Title>
+      </ListItem>
       <Button title={'Logout'} onPress={logout} />
-    </SafeAreaView>
+    </Card>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingTop: 40,
-  },
-});
 
 export default Profile;

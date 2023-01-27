@@ -1,6 +1,18 @@
 import {useEffect, useState} from 'react';
 import {baseUrl} from '../utils/variables';
 
+const doFetch = async (url, options) => {
+  const response = await fetch(url, options);
+  const json = await response.json();
+  if (!response.ok) {
+    const message = json.error
+      ? `${json.message}: ${json.error}`
+      : json.message;
+    throw new Error(message || response.statusText);
+  }
+  return json;
+};
+
 const useMedia = () => {
   const [mediaArray, setMediaArray] = useState([]);
 
@@ -29,23 +41,17 @@ const useMedia = () => {
 
 const useAuthentication = () => {
   const postLogin = async (userCredentials) => {
+    const options = {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(userCredentials),
+    };
     try {
-      const options = {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(userCredentials),
-      };
-      const response = await fetch(baseUrl + 'login', options);
-      const loginData = await response.json();
-      if (response.ok) {
-        return loginData;
-      } else {
-        throw new Error(loginData.message);
-      }
+      return await doFetch(baseUrl + 'login', options);
     } catch (error) {
-      throw new Error(error.message);
+      throw new Error('postLogin: ' + error.message);
     }
   };
 
@@ -54,20 +60,14 @@ const useAuthentication = () => {
 
 const useUser = () => {
   const getUserByToken = async (token) => {
+    const options = {
+      method: 'GET',
+      headers: {'x-access-token': token},
+    };
     try {
-      const options = {
-        method: 'GET',
-        headers: {'x-access-token': token},
-      };
-      const response = await fetch(baseUrl + 'users/user', options);
-      const userData = await response.json();
-      if (response.ok) {
-        return userData;
-      } else {
-        throw new Error(userData.message);
-      }
+      return await doFetch(baseUrl + 'users/user', options);
     } catch (error) {
-      throw new Error(error.message);
+      throw new Error('checkUser: ' + error.message);
     }
   };
 
@@ -80,19 +80,24 @@ const useUser = () => {
       body: JSON.stringify(userData),
     };
     try {
-      const response = await fetch(baseUrl + 'users', options);
-      const registerData = await response.json();
-      if (response.ok) {
-        return registerData;
-      } else {
-        throw new Error(registerData.message);
-      }
+      return await doFetch(baseUrl + 'users', options);
     } catch (error) {
-      throw new Error(error.message);
+      throw new Error('postUser: ' + error.message);
     }
   };
 
   return {getUserByToken, postUser};
 };
 
-export {useMedia, useAuthentication, useUser};
+const useTag = () => {
+  const getFilesByTag = async (tag) => {
+    try {
+      return await doFetch(baseUrl + 'tags/' + tag);
+    } catch (error) {
+      throw new Error('getFilesByTag, ' + error.message);
+    }
+  };
+  return {getFilesByTag};
+};
+
+export {useMedia, useAuthentication, useUser, useTag};
