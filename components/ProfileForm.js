@@ -1,10 +1,13 @@
-import React from 'react';
+import React, {useContext} from 'react';
+import {MainContext} from '../contexts/MainContext';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useUser} from '../hooks/ApiHooks';
 import {Controller, useForm} from 'react-hook-form';
-import {Card, Button, Input} from '@rneui/themed';
+import {Button, Input, Card} from '@rneui/themed';
 
-const RegisterForm = () => {
-  const {postUser, checkUsername} = useUser();
+const ProfileForm = ({handleToggleForm}) => {
+  const {putUser, getUserByToken} = useUser();
+  const {user, setUser} = useContext(MainContext);
   const {
     control,
     getValues,
@@ -12,47 +15,41 @@ const RegisterForm = () => {
     formState: {errors},
   } = useForm({
     defaultValues: {
-      username: '',
+      username: user.username,
       password: '',
-      email: '',
-      full_name: '',
+      confirmPassword: '',
+      email: user.email,
     },
     mode: 'onBlur',
   });
 
-  const register = async (registerData) => {
-    delete registerData.confirmPassword;
-    console.log('Registering: ', registerData);
-    try {
-      const registerResult = await postUser(registerData);
-      console.log('register', registerResult);
-    } catch (error) {
-      console.log('Error register', error);
+  const updateUser = async (updateData) => {
+    delete updateData.confirmPassword;
+    if (!updateData.password) {
+      delete updateData.password;
     }
-  };
-
-  const checkUser = async (username) => {
     try {
-      const userAvailable = await checkUsername(username);
-      console.log('checkUser', userAvailable);
-      return userAvailable || 'Username is already taken';
+      const token = await AsyncStorage.getItem('userToken');
+      const updateResult = await putUser(updateData, token);
+      console.log('updateUser', updateResult);
+      const updatedData = await getUserByToken(token);
+      setUser(updatedData);
+      handleToggleForm();
     } catch (error) {
-      console.error('checkUser', error.message);
+      console.log('Error updating user', error);
     }
   };
 
   return (
     <Card>
-      <Card.Title>Registration Form</Card.Title>
+      <Card.Title>Update User Form</Card.Title>
       <Controller
         control={control}
         rules={{
-          required: {value: true, message: 'This is required.'},
           minLength: {
             value: 3,
             message: 'Username min length is 3 characters.',
           },
-          validate: checkUser,
         }}
         render={({field: {onChange, onBlur, value}}) => (
           <Input
@@ -66,14 +63,9 @@ const RegisterForm = () => {
         )}
         name="username"
       />
-
       <Controller
         control={control}
         rules={{
-          required: {
-            value: true,
-            message: 'min 5 characters, needs one number, one uppercase letter',
-          },
           pattern: {
             value: /(?=.*\p{Lu})(?=.*[0-9]).{5,}/u,
             message: 'min 5 characters, needs one number, one uppercase letter',
@@ -91,7 +83,6 @@ const RegisterForm = () => {
         )}
         name="password"
       />
-
       <Controller
         control={control}
         rules={{
@@ -117,11 +108,9 @@ const RegisterForm = () => {
         )}
         name="confirmPassword"
       />
-
       <Controller
         control={control}
         rules={{
-          required: {value: true, message: 'email is required'},
           pattern: {
             value: /^[a-z0-9.-]{1,64}@[a-z0-9.-]{3,64}/i,
             message: 'Must be a valid email',
@@ -139,25 +128,9 @@ const RegisterForm = () => {
         name="email"
       />
 
-      <Controller
-        control={control}
-        rules={{minLength: {value: 3, message: 'must be at least 3 chars'}}}
-        render={({field: {onChange, onBlur, value}}) => (
-          <Input
-            placeholder="Full name"
-            onBlur={onBlur}
-            onChangeText={onChange}
-            value={value}
-            autoCapitalize="words"
-            errorMessage={errors.full_name && errors.full_name.message}
-          />
-        )}
-        name="full_name"
-      />
-
-      <Button title="Register" onPress={handleSubmit(register)} />
+      <Button title="Update user" onPress={handleSubmit(updateUser)} />
     </Card>
   );
 };
 
-export default RegisterForm;
+export default ProfileForm;

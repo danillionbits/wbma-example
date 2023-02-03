@@ -1,52 +1,35 @@
-import React, {useContext, useEffect, useState} from 'react';
-import {MainContext} from '../contexts/MainContext';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import {useTag} from '../hooks/ApiHooks';
-import {uploadsUrl} from '../utils/variables';
-import {Button, Card, Icon, ListItem} from '@rneui/themed';
+import React, {useState} from 'react';
+import {Keyboard, ScrollView, TouchableOpacity} from 'react-native';
+import {Button, Card, Text} from '@rneui/themed';
+import ProfileInfo from '../components/ProfileInfo';
+import ProfileForm from '../components/ProfileForm';
 
 const Profile = () => {
-  const {getFilesByTag} = useTag();
-  const {setIsLoggedIn, user, setUser} = useContext(MainContext);
-  const [avatar, setAvatar] = useState('');
-
-  const loadAvatar = async () => {
-    try {
-      const avatarArray = await getFilesByTag('avatar_' + user.user_id);
-      setAvatar(avatarArray.pop().filename);
-    } catch (error) {
-      console.log('user avatar fetch failed', error.message);
-    }
-  };
-
-  useEffect(() => {
-    loadAvatar();
-  }, []);
-
-  const logout = async () => {
-    setUser({});
-    setIsLoggedIn(false);
-    try {
-      await AsyncStorage.clear();
-    } catch (e) {
-      console.log('clearing asyncstorage failed', e);
-    }
-  };
+  const [toggleForm, setToggleForm] = useState(true);
+  const handleToggleForm = () => setToggleForm(!toggleForm);
 
   return (
-    <Card>
-      <Card.Title>{user.username}</Card.Title>
-      <Card.Image source={{uri: uploadsUrl + avatar}} />
-      <ListItem>
-        <Icon name="email" />
-        <ListItem.Title>{user.email}</ListItem.Title>
-      </ListItem>
-      <ListItem>
-        <Icon name="badge" />
-        <ListItem.Title>{user.full_name}</ListItem.Title>
-      </ListItem>
-      <Button title={'Logout'} onPress={logout} />
-    </Card>
+    <ScrollView>
+      <TouchableOpacity onPress={() => Keyboard.dismiss()} activeOpacity={1}>
+        {toggleForm ? (
+          <ProfileInfo />
+        ) : (
+          <ProfileForm handleToggleForm={handleToggleForm} />
+        )}
+        <Card>
+          <Text>
+            {toggleForm
+              ? 'Info not correct? Please update'
+              : 'Go back to profile'}
+          </Text>
+          <Button
+            type="outline"
+            title={toggleForm ? 'Update info' : 'Go back'}
+            onPress={() => setToggleForm(!toggleForm)}
+          />
+        </Card>
+      </TouchableOpacity>
+    </ScrollView>
   );
 };
 
